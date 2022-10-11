@@ -1,0 +1,8 @@
+numpy
+scipy
+scikit-learn
+pytorch-gpu
+tqdm
+ipdb
+wandb
+k-means-constrained
