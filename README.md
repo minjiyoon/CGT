@@ -4,10 +4,6 @@ We propose a novel, modern graph generation problem to enable generating privacy
 Our proposed graph generative model, Computation Graph Transformer (CGT) 1) operates on minibatches rather than the whole graph, avoiding scalability issues, and 2) reduces the task of learning graph distributions to learning feature vector sequence distributions, which we approach with a novel Transformer architecture.
 
 You can see our [preprint paper](https://arxiv.org/abs/2207.04396) for more details.
-
-## Overview
-`Data/` directory contains all files to preprocess OAG-CS raw datasets and extract OAG-ML and OAG-CN subgraphs.
-`Model/` directory contains how to train HGNN and KTN models on the preprocessed heterogeneous datasets. 
   
 ## Setup
 This implementation is based on python==3.7. To run the code, you need the dependencies listed in `requirement.txt'
