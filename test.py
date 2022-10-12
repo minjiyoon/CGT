@@ -43,7 +43,7 @@ def main():
     args.label_size = label_size
     args.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    trials = 3
+    trials = 1
     train_acc_list = np.zeros((3, len(args.model_list), trials))
     test_acc_list = np.zeros((3, len(args.model_list), trials))
 
