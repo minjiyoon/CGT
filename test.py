@@ -13,20 +13,11 @@ from operator import itemgetter
 from time import perf_counter
 
 from args import get_args
-from task.utils.utils import load_graph, load_gpt_name
+from task.utils.utils import load_graph
 from task.utils.sample import split_ids, split_dataset, graph_sampler
 
 from task.aggregation.gcn import run as aggregation
-from task.depth.dagnn import run as dagnn
-from task.depth.deepergcn import run as deepergcn
-from task.shift.srgnn import run as shift
-
-from task.sampling.passgcn import run as passgcn
-from task.sampling.asgcn.run_pubmed import run as asgcn
-from task.sampling.fastgcn.train import run as fastgcn
-
 import generator.gpt.gpt as gpt
-import generator.bayes.bayes as bayes
 
 
 def evaluate(args, feats, graphs, labels, ids, supp, feature_matrix=None):
@@ -39,27 +30,7 @@ def evaluate(args, feats, graphs, labels, ids, supp, feature_matrix=None):
 
     for i, model_name in enumerate(args.model_list):
         if args.task_name == "aggregation":
-            if model_name == "gat":
-                acc_mic[i], acc_mac[i], train_time[i], test_time[i] = shift(args, model_name, feats, graphs, labels, ids, supp, feature_matrix)
-            else:
-                acc_mic[i], acc_mac[i], train_time[i], test_time[i] = aggregation(args, model_name, feats, graphs, labels, ids, feature_matrix)
-        elif args.task_name == "depth":
-            if model_name == "dagnn":
-                acc_mic[i], acc_mac[i], train_time[i], test_time[i] = dagnn(args, feats, graphs, labels, ids, feature_matrix)
-            elif model_name == "deepergcn":
-                acc_mic[i], acc_mac[i], train_time[i], test_time[i] = deepergcn(args, feats, graphs, labels, ids, feature_matrix)
-        elif args.task_name == "shift":
-            acc_mic[i], acc_mac[i], train_time[i], test_time[i] = shift(args, model_name, feats, graphs, labels, ids, supp, feature_matrix)
-        elif args.task_name == "sampling":
-            if model_name == "pass":
-                acc_mic[i], acc_mac[i], train_time[i], test_time[i] = passgcn(args, feats, graphs, labels, ids, passgcn=True, feature_matrix=feature_matrix)
-            elif model_name == "graphsage":
-                acc_mic[i], acc_mac[i], train_time[i], test_time[i] = passgcn(args, feats, graphs, labels, ids, passgcn=False, feature_matrix=feature_matrix)
-            elif model_name == "asgcn":
-                acc_mic[i], acc_mac[i], train_time[i], test_time[i] = asgcn(args, feats, graphs, labels, ids, feature_matrix)
-            elif model_name == "fastgcn":
-                acc_mic[i], acc_mac[i], train_time[i], test_time[i] = fastgcn(args, feats, graphs, labels, ids, feature_matrix)
-
+            acc_mic[i], acc_mac[i], train_time[i], test_time[i] = aggregation(args, model_name, feats, graphs, labels, ids, feature_matrix)
     return acc_mic, acc_mac
 
 
@@ -97,10 +68,7 @@ def main():
         # Train GPT on the original feature list
         # GPT will output the clustered feature list and synthetic feature lists
         start_time = perf_counter()
-        if args.gpt_model == "GPT" or args.gpt_model == "XLNet":
-            generated_list, cluster_center = gpt.run(args, adj, feat, label, ids, train_name=args.gpt_train_name)
-        elif args.gpt_model == "Bayes":
-            generated_list = bayes.run(args, adj, feat, label, ids, train_name=args.gpt_train_name)
+        generated_list, cluster_center = gpt.run(args, adj, feat, label, ids, train_name=args.gpt_train_name)
         print('GPT total time: {:.3f}'.format(perf_counter() - start_time))
 
         # Check GNN performance on the clustered dataset

@@ -1,12 +1,11 @@
 from collections import defaultdict
 import os
-from jinja2 import UndefinedError
 import torch
 
 from time import perf_counter
 
 from generator.gpt.dataset import DatasetType
-from generator.gpt.model import GPT, GPTConfig, XLNet
+from generator.gpt.model import GPTConfig, XLNet
 from generator.gpt.trainer import Trainer, TrainerConfig
 from generator.gpt.utils import sample
 from generator.cluster import cluster_feat_list, map_back_to_features
@@ -38,12 +37,7 @@ def train(args, adjs, cluster_ids, labels, ids, train_name, split_name='train'):
     mconf = GPTConfig(train_dataset.vocab_size, train_dataset.block_size, step_num=step_num, sample_num=sample_num,
                 embd_pdrop=args.gpt_dropout, resid_pdrop=args.gpt_dropout, attn_pdrop=args.gpt_dropout,
                 n_layer=args.gpt_layers, n_head=args.gpt_heads, n_embd=args.gpt_hidden_dim*args.gpt_heads, n_class=args.label_size)
-    if args.gpt_model == "GPT":
-        model = GPT(mconf)
-    elif args.gpt_model == "XLNet":
-        model = XLNet(mconf)
-    else:
-        raise(UndefinedError)
+    model = XLNet(mconf)
 
     tokens_per_epoch = train_dataset.block_size * train_dataset.short_seq_num * len(train_dataset)
     final_tokens =  tokens_per_epoch * args.gpt_epochs

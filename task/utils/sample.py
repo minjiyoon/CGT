@@ -7,8 +7,6 @@ import networkx as nx
 import numpy as np
 import torch
 
-from ..shift.srgnn import biased_sample
-
 def set_seed(seed):
     random.seed(seed)
     np.random.seed(seed)
@@ -25,14 +23,6 @@ def split_ids(args, graph, labels):
     ids['test'] = node_ids[int(train_ratio * len(node_ids)):]
 
     supp = None
-    if args.task_name == "shift" and args.alpha > 0:
-        train_bias, train_iid, supp = biased_sample(args, graph, torch.from_numpy(labels), ids)
-        # QQQ: I think we need to shuffle ids; they are in order of label ids
-        random.shuffle(train_bias)
-        random.shuffle(train_iid)
-        ids['train'] = train_bias
-        #ids['train_iid'] = train_iid
-
     return ids, supp
 
 val_ratio = 0.2

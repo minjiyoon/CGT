@@ -1,8 +1,11 @@
+pytorch
+torchvision
+torchaudio
+cudatoolkit
 numpy
-scipy
+networkx
 scikit-learn
-pytorch-gpu
+jinja2
 tqdm
-ipdb
-wandb
 k-means-constrained
+ortools==9.3.10497
