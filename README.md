@@ -1,7 +1,7 @@
-# SCALABLE AND PRIVACY-ENHANCED GRAPH GENERATIVE MODEL FOR GRAPH NEURAL NETWORKS
+# Scalable and Privacy-enhanced Graph Generative Model for Graph Neural Networks
 
 We propose a novel, modern graph generation problem to enable generating privacy-controlled, synthetic substitutes of large-scale real-world graphs that can be effectively used to evaluate GNN models.
-More specifically, we propose a novel graph generative model, Computation Graph Transformer (CGT) that can learn and reproduce the distribution of real-world graphs in a privacy-enhanced way.
+Our proposed graph generative model, Computation Graph Transformer (CGT) 1) operates on minibatches rather than the whole graph, avoiding scalability issues, and 2) reduces the task of learning graph distributions to learning feature vector sequence distributions, which we approach with a novel Transformer architecture.
 
 You can see our [preprint paper](https://arxiv.org/abs/2207.04396) for more details.
 
@@ -12,22 +12,22 @@ You can see our [preprint paper](https://arxiv.org/abs/2207.04396) for more deta
 ## Setup
 This implementation is based on python==3.7. To run the code, you need the dependencies listed in `requirement.txt'
 
-## OAG DataSet
-Our current experiments are conducted on Open Academic Graph on Computer Science field (OAG-CS). 
-More information to how to download and preprocess OAG-CS dataset can be found in `Data/` directory.
+## DataSet
+You can download public graph datasets in the npz format from [GNN-Benchmark](https://github.com/shchur/gnn-benchmark).
+Place the dataset in `data/` directory.
 
 ## Usage
-Execute `MODEL/run_oag.sh` to run 8 different zero-shot transfer learning tasks on the OAG-CS graph using KTN.
+Execute `run_aggregation.sh` to run 4 different GCN models with variable noisy edge numbers on the given graph.
 The details of other optional hyperparameters can be found in args.py.
 
 ### Citation
 Please consider citing the following paper when using our code for your application.
 
 ```bibtex
-@article{yoon2022zero,
-  title={Zero-shot Domain Adaptation of Heterogeneous Graphs via Knowledge Transfer Networks},
-  author={Yoon, Minji and Palowitch, John and Zelle, Dustin and Hu, Ziniu and Salakhutdinov, Ruslan and Perozzi, Bryan},
-  journal={arXiv preprint arXiv:2203.02018},
+@article{yoon2022scalable,
+  title={Scalable Privacy-enhanced Benchmark Graph Generative Model for Graph Convolutional Networks},
+  author={Yoon, Minji and Wu, Yue and Palowitch, John and Perozzi, Bryan and Salakhutdinov, Ruslan},
+  journal={arXiv preprint arXiv:2207.04396},
   year={2022}
 }
 ```
