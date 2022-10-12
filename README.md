@@ -13,7 +13,7 @@ You can download public graph datasets in the npz format from [GNN-Benchmark](ht
 Place the dataset in `data/` directory.
 
 ## Usage
-Execute `run_aggregation.sh` to run 4 different GCN models with variable noisy edge numbers on the given graph.
+Execute `sh run_aggregation.sh` to run 4 different GCN models with variable noisy edge numbers on the given graph.
 The details of other optional hyperparameters can be found in args.py.
 
 ### Citation
