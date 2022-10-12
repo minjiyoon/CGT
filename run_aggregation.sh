@@ -12,7 +12,7 @@ do
     for ((j=0;j<$noise_length;j++))
     do
         python test.py --dataset "${DATASETS[$i]}" --batch_size ${BATCH_SIZES[$j]} \
-            --task_name "aggregation" -n "gcn" "sgc" "gin" --noise_num ${NOISES[$j]} --dup_code
+            --task_name "aggregation" -n "gcn" "sgc" "gin" --noise_num ${NOISES[$j]}
     done
 done
 
