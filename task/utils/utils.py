@@ -12,7 +12,56 @@ import torch
 import torch.nn.functional as F
 
 
+def set_seed(seed):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+
+train_ratio = 0.4
+val_ratio = 0.2
+def split_ids(args, graph, labels):
+    node_ids = list(range(graph.shape[0]))
+    random.shuffle(node_ids)
+
+    ids = {}
+    ids['train'] = node_ids[:int(train_ratio * len(node_ids))]
+    ids['val'] = node_ids[int(train_ratio * len(node_ids)):int((train_ratio + val_ratio) * len(node_ids))]
+    ids['test'] = node_ids[int((train_ratio + val_ratio) * len(node_ids)):]
+
+    return ids
+
+def load_ogbn(args):
+    master_file = args.data_dir + "/ogbn-master.csv"
+    master = pd.read_csv(master_file, index_col = 0)
+    meta_dict = master[args.dataset]
+
+    add_inverse_edge = meta_dict['add_inverse_edge'] == 'True'
+    binary = meta_dict['binary'] == 'True'
+    additional_node_files = []
+    additional_edge_files = []
+
+    data_dir = args.data_dir + "/" + args.dataset + "/"
+    data = read_graph_pyg(data_dir, add_inverse_edge = add_inverse_edge, additional_node_files = additional_node_files, additional_edge_files = additional_edge_files, binary=binary)[0]
+    data.x = normalize_features(data.x)
+    node_feat = data.x.numpy()
+
+    data.edge_index = to_undirected(data.edge_index)
+    graph = convert_to_edge_list(data.edge_index, node_feat)
+
+    label = pd.read_csv(osp.join(data_dir, 'node-label.csv.gz'), compression='gzip', header = None).values
+    label = label.squeeze()
+
+    feat_size = node_feat.shape[1]
+    label_size = label.max() - label.min() + 1
+
+    return graph, node_feat, label, feat_size, label_size
+
+
 def load_graph(args):
+    if args.dataset in ("ogbn-arxiv", "ogbn-products"):
+        return load_ogbn(args)
+
     dataset = args.data_dir + "/" + args.dataset + ".npz"
     with np.load(dataset, allow_pickle = True) as loader:
         loader = dict(loader)

@@ -4,7 +4,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import gc
 import numpy as np
-from time import perf_counter
+from tqdm import tqdm
+from time import perf_counter, sleep
 
 from ..utils.utils import calc_f1, calc_loss
 
@@ -50,10 +51,13 @@ class GCN(nn.Module):
             ml.append({'params': self.attentionW})
         return ml
 
-    def forward(self, feats, adj):
+    def forward(self, feat, raw_adj):
+        batch_num, batch_size = raw_adj.shape[0], raw_adj.shape[1]
+        ids = torch.range(0, (batch_num - 1) * batch_size, batch_size, dtype=torch.long).to(raw_adj.device)
+        adj = torch.block_diag(*raw_adj).to(raw_adj.device)
         if self.pooling == 'avg':
-            adj = self.avg_pooling(feats, adj)
-        X = feats
+            adj = self.avg_pooling(feat, adj)
+        X = feat
         for w in self.W:
             Z = w(X)
             if self.attention:
@@ -63,14 +67,14 @@ class GCN(nn.Module):
                 X = F.relu(X)
         if self.output_layer:
             X = self.outputW(X)
-        return X
+        return X[ids]
 
     def avg_pooling(self, feats, adj):
         nonzeros = torch.nonzero(torch.norm(feats, dim=1), as_tuple=True)[0]
         nonzero_adj = adj[:, nonzeros]
         row_sum = torch.sum(nonzero_adj, dim=1)
         row_sum = row_sum.masked_fill_(row_sum == 0, 1.)
-        row_sum = torch.diag(1/row_sum).to(self.device)
+        row_sum = torch.diag(1/row_sum).to(adj.device)
         adj = torch.spmm(row_sum, adj)
         return adj
 
@@ -86,58 +90,61 @@ class GCN(nn.Module):
         return attention
 
 
-def run(args, model_name, feats, graphs, labels, ids, feature_matrix=None):
+def run(args, model_name, train_loader, val_loader, test_loader):
     """
     Evaluate GNN performance
     """
 
     device = args.device
     model = GCN(model_name, args.feat_size, args.label_size, args.hidden_dim, args.step_num)
-    model = model.to(device)
+    model = nn.DataParallel(model).to(device)
 
     # Test GCN models
-    def test_model(args, model, feats, graphs, labels, ids):
+    def test_model(args, model, data_loader, split='val'):
         start_time = perf_counter()
-        device = args.device
         stack_output = []
         stack_label = []
         model.eval()
-        for feat, adj, label, id in zip(feats, graphs, labels, ids):
-            if feature_matrix is not None:
-                feat = feature_matrix[feat]
-            feat, adj, label = feat.to(device), adj.to(device), label.to(device)
-            output = model(feat, adj)
-            stack_output.append(output[id].detach().cpu())
-            stack_label.append(label.cpu())
+        with tqdm(data_loader, unit="batch") as t_data_loader:
+            for batch in t_data_loader:
+                feats, adjs, labels = batch["feat"].to(device), batch["adj"].to(device), batch["label"].to(device)
+                outputs = model(feats, adjs)
+                loss = calc_loss(outputs, labels)
+                stack_output.append(outputs.detach().cpu())
+                stack_label.append(labels.cpu())
+                t_data_loader.set_description(f"{split}")
+                t_data_loader.set_postfix(loss=loss.item())
+                sleep(0.1)
         stack_output = torch.cat(stack_output, dim=0)
         stack_label = torch.cat(stack_label, dim=0)
         loss = calc_loss(stack_output, stack_label)
         acc_mic, acc_mac = calc_f1(stack_output, stack_label)
-        test_time = perf_counter()-start_time
-        return loss, acc_mic, acc_mac, test_time
+        return loss, acc_mic, acc_mac
 
     ml = list()
-    ml.extend(model.get_parameters())
+    ml.extend(model.module.get_parameters())
     optimizer = optim.Adam(ml, lr=args.lr)
 
-    start_time = perf_counter()
     patient = 0
     min_loss = np.inf
     for epoch in range(args.epochs):
-        for feat, adj, label, id in zip(feats['train'], graphs['train'], labels['train'], ids['train']):
-            if feature_matrix is not None:
-                feat = feature_matrix[feat]
-            feat, adj, label = feat.to(device), adj.to(device), label.to(device)
+        with tqdm(train_loader, unit="batch") as t_train_loader:
+            for batch in t_train_loader:
+                feats, adjs, labels = batch["feat"].to(device), batch["adj"].to(device), batch["label"].to(device)
 
-            model.train()
-            optimizer.zero_grad()
-            output = model(feat, adj)
-            loss = calc_loss(output[id], label)
-            loss.backward()
-            optimizer.step()
+                model.train()
+                optimizer.zero_grad()
+                outputs = model(feats, adjs)
+                loss = calc_loss(outputs, labels)
+                loss.backward()
+                optimizer.step()
+
+                t_train_loader.set_description(f"Epoch {epoch}")
+                t_train_loader.set_postfix(loss=loss.item())
+                sleep(0.1)
 
         with torch.no_grad():
-            new_loss, acc_mic, acc_mac, val_time = test_model(args, model, feats['val'], graphs['val'], labels['val'], ids['val'])
+            new_loss, acc_mic, acc_mac = test_model(args, model, val_loader, 'val')
             if new_loss >= min_loss:
                 patient = patient + 1
             else:
@@ -147,9 +154,8 @@ def run(args, model_name, feats, graphs, labels, ids, feature_matrix=None):
         if patient == args.early_stopping:
             break
 
-    train_time = perf_counter() - start_time
-    test_loss, acc_mic, acc_mac, test_time = test_model(args, model, feats['test'], graphs['test'], labels['test'], ids['test'])
+    _, acc_mic, acc_mac = test_model(args, model, test_loader, 'test')
 
     del model
-    return acc_mic, acc_mac, train_time, test_time
+    return acc_mic, acc_mac
 
