@@ -123,7 +123,7 @@ def get_args():
                         help='GPT, XLNet, or Bayes')
     parser.add_argument('--gpt_softmax_temperature', type=float, default=1.,
                         help='Temperature used to sample')
-    parser.add_argument('--gpt_epochs', type=int, default=5,
+    parser.add_argument('--gpt_epochs', type=int, default=50,
                         help='Number of epochs to train.')
     parser.add_argument('--gpt_batch_size', type=int, default=128,
                         help='Size of batch.')

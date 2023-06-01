@@ -15,7 +15,7 @@ def kmeans(feats, cluster_num, cluster_size, cluster_sample_num):
     else:
         x = feats
 
-    pca = PCA(n_components=128)
+    pca = PCA(n_components=min(feats.shape[1], 128))
     x_pca = pca.fit_transform(x)
 
     clf = KMeansConstrained(n_clusters=cluster_num, size_min=cluster_size, init='random', n_init=1, max_iter=8)

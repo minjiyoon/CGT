@@ -7,6 +7,7 @@ import torch
 class Dataset(torch.utils.data.Dataset):
     def __init__(self, args, adjs, cluster_ids, labels, ids):
         self.adjs = adjs
+        self.adjs_list = isinstance(adjs, list)
         self.cluster_ids = cluster_ids
         self.labels = labels
         self.ids = ids
@@ -39,7 +40,10 @@ class Dataset(torch.utils.data.Dataset):
                 if target_id == org_empty_id:
                     source_ids = []
                 else:
-                    source_ids = np.nonzero(self.adjs[target_id])[0].tolist()
+                    if self.adjs_list:
+                        source_ids = self.adjs[target_id]
+                    else:
+                        source_ids = np.nonzero(self.adjs[target_id])[0].tolist()
                 # Sample fixed number of neighbors
                 if len(source_ids) == 0:
                     sampled_ids = self.sample_num * [org_empty_id]
@@ -49,7 +53,7 @@ class Dataset(torch.utils.data.Dataset):
                     sampled_ids = np.random.choice(source_ids, self.sample_num, replace = False).tolist()
 
                 if self.noise_num > 0:
-                    perm = np.random.permutation(self.adjs.shape[0])[:self.noise_num]
+                    perm = np.random.permutation(len(self.adjs))[:self.noise_num]
                     sampled_ids = np.concatenate((sampled_ids, perm), axis=0)
 
                 sampled_cluster_ids.extend(self.cluster_ids[sampled_ids])

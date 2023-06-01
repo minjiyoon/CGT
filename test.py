@@ -46,7 +46,7 @@ def main():
 
     # Load the original graph datasets
     adj, feat, label, feat_size, label_size = load_graph(args)
-    ids = split_ids(args, adj, label)
+    ids = split_ids(args, feat.shape[0])
     args.feat_size = feat_size
     args.label_size = label_size
     args.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -76,18 +76,19 @@ def main():
         ## Check GNN performance on the generated dataset
         start_time = perf_counter()
         acc_mic, acc_mac = evaluate(args, gen_train_set, gen_val_set, gen_test_set)
-        acc_mic_list[0, : , t] = acc_mic
-        acc_mac_list[0, : , t] = acc_mac
+        acc_mic_list[1, : , t] = acc_mic
+        acc_mac_list[1, : , t] = acc_mac
         print('Synthetic evaluation time: {:.3f}, acc: {}'.format(perf_counter() - start_time, acc_mic))
 
     test_acc_avg = np.average(acc_mic_list, axis=2)
     test_acc_std = np.std(acc_mic_list, axis=2)
 
-    print('\nTask: ' + args.task_name + ', Dataset: ' + args.dataset)
+    print('Task: ' + args.task_name + ', Dataset: ' + args.dataset)
     for model_name in args.model_list:
         print(model_name, end=', ')
+    print()
     for model_id in range(len(args.model_list)):
-        print("\nORI: {:.2f} {:.3f}, GEN: {:.2f} {:.3f}".format(test_acc_avg[0][model_id], test_acc_std[0][model_id],\
+        print("ORG: {:.2f} {:.3f}, GEN: {:.2f} {:.3f}".format(test_acc_avg[0][model_id], test_acc_std[0][model_id],\
                                                             test_acc_avg[1][model_id], test_acc_std[1][model_id]))
 
 

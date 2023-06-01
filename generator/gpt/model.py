@@ -163,10 +163,6 @@ class XLNet(nn.Module):
         # remove start_id
         self.head = nn.Linear(config.n_embd, config.vocab_size - 1, bias=False)
 
-        #mask  = torch.ones(1, config.block_size, config.vocab_size - 1)
-        #mask[:, 0, -1] = 0
-        #self.register_buffer("output_mask", mask)
-
         self.apply(self._init_weights)
         self.criterion = nn.CrossEntropyLoss()
 
@@ -236,11 +232,10 @@ class XLNet(nn.Module):
 
         x = self.drop(token_embeddings + position_embeddings[:, :t])
         q = self.drop((self.query_emb + position_embeddings[:, 1:(t+1)] + class_embeddings).expand_as(x))
-        _, q = self.blocks((x,q))
+        _, q = self.blocks((x, q))
         q = self.ln_f(q)
         logits = self.head(q)
         logits[:, 0, -1] = float('-inf')
-        #logits = logits.masked_fill(self.output_mask[:, :t , : ] == 0, float('-inf'))
 
         loss = None
         if targets is not None:

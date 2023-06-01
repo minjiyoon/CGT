@@ -67,7 +67,7 @@ def generate(args, model, labels, ids, split):
     result = torch.cat(result, dim = 0)
     print("[GPT] name: {}, split: {}, generation time: {:.3f}".format(args.gpt_train_name, split, perf_counter() - start_time))
 
-    return result
+    return result.cpu()
 
 
 def run(args, graphs, feats, labels, ids):

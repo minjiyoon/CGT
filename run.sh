@@ -1,8 +1,8 @@
-DATASETS=("cora")
+DATASETS=("cora" "citeseer")
 data_length=${#DATASETS[@]}
 
 # Experiment 1: effects of noise to aggregation strategies
-NOISES=(0)
+NOISES=(0 2 4)
 noise_length=${#NOISES[@]}
 
 for ((i=0;i<$data_length;i++))
