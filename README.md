@@ -21,11 +21,34 @@ Place the dataset in `data/` directory.
 For your convenience, `cora.npz` and `citeseer.npz` are already saved in `data\`.
 
 ## Usage
-In `run.sh`, you can write down a list of graph datasets you want to learn distributions into `DATASETS`.
-Then you can add different sizes of noisy neighbors to augment the original graphs using `NOISES`.
-Finally, by executing `run.sh`, we learn three different distributions for each dataset with different noises.
-We train 3 different GCN models (GCN, GIN, SGC) on pairs of original and synthetic graphs, and then compare their performance.
+In `run.sh`, you write down a list of graph datasets that you want to learn distributions into `DATASETS`.
+Then you add different sizes of noisy neighbors to augment the original graphs using `NOISES`.
+Finally, by executing `run.sh`, we learn three different distributions with different noise sizes for each dataset.
+For each dataset, we train three different GCN models (GCN, GIN, SGC) on a pair of original and synthetic graphs, and then compare their performance.
 The details of other hyperparameters can be found in args.py.
+
+## File description
+
+We provide brief descriptions for each file as follows:
+
+| Directory/File | description |
+| ---- | ---- |
+| run.sh | script to run experiments |
+| args.py | set hyperparameters |
+| test.py | prepare models, read datasets, train/validation loops |
+| data/ | download datasets |
+| generator/ | codes related to graph transformer |
+| generator/cluster.py | k-means or DP k-means clustering |
+| generator/gpt | codes related to computation graph transformer |
+| generator/gpt/gpt.py | prepare models, read datasets, train/generation loops |
+| generator/gpt/dataset.py | flatten computation graphs into sequences |
+| generator/gpt/model.py | XLNet model |
+| generator/gpt/trainer.py | training loop |
+| generator/gpt/utils.py | utility functions |
+| task/ | GNN models |
+| task/aggregation | GNN models with different aggregation strategies (GCN, GAT, SGN, GIN) |
+| task/utils | data cleaning, computation graph samplings |
+
 
 ### Citation
 Please consider citing the following paper when using our code for your application.
