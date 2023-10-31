@@ -15,14 +15,17 @@ pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 torchaudio==0.13.1 --e
 ```
 The code is implemented on PyTorch DataParallel.
 
-## DataSet
+## Dataset
 You can download public graph datasets in the npz format from [GNN-Benchmark](https://github.com/shchur/gnn-benchmark).
 Place the dataset in `data/` directory.
 For your convenience, `cora.npz` and `citeseer.npz` are already saved in `data\`.
 
 ## Usage
-Execute `run.sh` to run 3 different GCN models with variable noisy edge numbers on the given graph.
-The details of other optional hyperparameters can be found in args.py.
+In `run.sh`, you can write down a list of graph datasets you want to learn distributions into `DATASETS`.
+Then you can add different sizes of noisy neighbors to augment the original graphs using `NOISES`.
+Finally, by executing `run.sh`, we learn three different distributions for each dataset with different noises.
+We train 3 different GCN models (GCN, GIN, SGC) on pairs of original and synthetic graphs, and then compare their performance.
+The details of other hyperparameters can be found in args.py.
 
 ### Citation
 Please consider citing the following paper when using our code for your application.
