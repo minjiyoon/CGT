@@ -13,11 +13,12 @@ conda activate cgt
 pip install -r requirement.txt
 pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 torchaudio==0.13.1 --extra-index-url https://download.pytorch.org/whl/cu117
 ```
-The code is implemented on PyTorch DistributedDataParallel.
+The code is implemented on PyTorch DataParallel.
 
 ## DataSet
 You can download public graph datasets in the npz format from [GNN-Benchmark](https://github.com/shchur/gnn-benchmark).
 Place the dataset in `data/` directory.
+For your convenience, `cora.npz` and `citeseer.npz` are already saved in `data\`.
 
 ## Usage
 Execute `run.sh` to run 3 different GCN models with variable noisy edge numbers on the given graph.
@@ -26,7 +27,7 @@ The details of other optional hyperparameters can be found in args.py.
 ### Citation
 Please consider citing the following paper when using our code for your application.
 
-```bibtex
+```
 @article{yoon2022scalable,
   title={Scalable Privacy-enhanced Benchmark Graph Generative Model for Graph Convolutional Networks},
   author={Yoon, Minji and Wu, Yue and Palowitch, John and Perozzi, Bryan and Salakhutdinov, Ruslan},
