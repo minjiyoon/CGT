@@ -6,7 +6,14 @@ Our proposed graph generative model, Computation Graph Transformer (CGT) 1) oper
 You can see our [ICML 2023 paper](https://arxiv.org/abs/2207.04396) for more details.
 
 ## Setup
-This implementation is based on python==3.7. To run the code, you need the dependencies listed in `requirement.txt'
+Create a new conda environment, install [PyTorch](https://pytorch.org) and the remaining requirements:
+```
+conda create python==3.7 -n cgt
+conda activate cgt
+pip install -r requirement.txt
+pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 torchaudio==0.13.1 --extra-index-url https://download.pytorch.org/whl/cu117
+```
+The code is implemented on PyTorch DistributedDataParallel.
 
 ## DataSet
 You can download public graph datasets in the npz format from [GNN-Benchmark](https://github.com/shchur/gnn-benchmark).
