@@ -1,3 +1,9 @@
+"""
+This code block is adapted from:
+- Repository: minGPT
+- Link: https://github.com/karpathy/minGPT/tree/master
+"""
+
 import math
 import logging
 

@@ -12,6 +12,16 @@ from generator.cluster import cluster_feats
 
 
 def train(args, adjs, cluster_ids, labels, ids, split):
+    """
+    Train CGT
+    Args:
+        args: arguments
+        adjs: a list of adjacency matrix of each computation graphs
+        cluster_ids: cluster ids of each nodes
+        labels: label of each nodes
+        ids: node id list
+        split: split name ('train', 'val', 'test')
+    """
     # hyperparameters of computation graphs
     dataset = Dataset(args, adjs, cluster_ids, labels, ids)
     params = {'batch_size': args.gpt_batch_size,
@@ -45,6 +55,15 @@ def train(args, adjs, cluster_ids, labels, ids, split):
 
 
 def generate(args, model, labels, ids, split):
+    """
+    Generate cluster ids for each node using CGT
+    Args:
+        args: arguments
+        model: CGT model
+        labels: label of each nodes
+        ids: node id list
+        split: split name ('train', 'val', 'test')
+    """
     start_time = perf_counter()
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -71,6 +90,15 @@ def generate(args, model, labels, ids, split):
 
 
 def run(args, graphs, feats, labels, ids):
+    """
+    Learn graph distribution and generate new graphs using CGT
+    Args:
+        args: arguments
+        graphs: a list of computation graphs
+        feats: a list of feature matrices
+        labels: a list of labels
+        ids: a list of node ids
+    """
     # Create save directory
     save_dir = 'generator/gpt/save'
     if not os.path.isdir(save_dir):

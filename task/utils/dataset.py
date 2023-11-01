@@ -3,6 +3,16 @@ import numpy as np
 from collections import defaultdict
 
 class Dataset(torch.utils.data.Dataset):
+    """
+    Computation Graph Dataset for PyTorch DataParallel
+    Args:
+        args: arguments
+        split: split name ('train', 'val', 'test')
+        adjs: adjacency matrix
+        feats: feature matrix
+        labels: label vector
+        ids: node id list
+    """
     def __init__(self, args, split, adjs, feats, labels, ids):
         self.adjs = adjs
         self.adjs_list = isinstance(adjs, list)
@@ -24,6 +34,15 @@ class Dataset(torch.utils.data.Dataset):
         return len(self.ids)
 
     def __getitem__(self, index):
+        """
+        Provide a computation graph sampled around a seed node (index)
+        Args:
+            index: seed node index
+        Returns:
+            feat: feature matrix (sampled_node_num, input_dim)
+            adj: adjacency matrix (sampled_node_num, sampled_node_num)
+            label: label vector (1)
+        """
         seed_id = self.ids[index]
         sampled_nodes = [seed_id]
         curr_target_list = [seed_id]
@@ -61,7 +80,7 @@ class Dataset(torch.utils.data.Dataset):
                 }
 
     def compute_dup_adj(self):
-        """ duplicate-encoded adjacency matrix (fixed shape)"""
+        """ duplicate-encoded adjacency matrix (fixed shape for all nodes)"""
         seed_id = 0
         sampled_nodes = [seed_id]
         curr_target_list = [seed_id]
@@ -100,6 +119,7 @@ class Dataset(torch.utils.data.Dataset):
         return sampled_adj
 
 def collate(items):
+    """Collate function for PyTorch DataLoader"""
     items = [(item["feat"], item["adj"], item["label"]) for item in items]
     (feats, adjs, labels) = zip(*items)
 

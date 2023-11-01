@@ -21,6 +21,17 @@ import generator.gpt.gpt as gpt
 
 
 def evaluate(args, train_set, val_set, test_set):
+    """
+    Evaluate the performance of GNNs on the given dataset
+    Args:
+        args: arguments
+        train_set: training set
+        val_set: validation set
+        test_set: test set
+    Returns:
+        acc_mic: micro-F1 score
+        acc_mac: macro-F1 score
+    """
     acc_mic = np.zeros(len(args.model_list))
     acc_mac = np.zeros(len(args.model_list))
 

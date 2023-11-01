@@ -5,6 +5,15 @@ import random
 import torch
 
 class Dataset(torch.utils.data.Dataset):
+    """
+    Flatten Computation Graph Dataset for training CGT
+    Args:
+        args: arguments
+        adjs: a list of adjacency matrix of each computation graph
+        cluster_ids: cluster ids for each nodes
+        labels: labels for each nodes
+        ids: ids
+    """
     def __init__(self, args, adjs, cluster_ids, labels, ids):
         self.adjs = adjs
         self.adjs_list = isinstance(adjs, list)

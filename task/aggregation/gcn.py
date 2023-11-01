@@ -11,6 +11,16 @@ from ..utils.utils import calc_f1, calc_loss
 
 # GCN template
 class GCN(nn.Module):
+    """
+    Graph Convolutional Networks (GCN)
+    Args:
+        model_name: model name ('gcn', 'gin', 'sgc', 'gat')
+        input_dim: input dimension
+        output_dim: output dimension
+        hidden_dim: hidden dimension
+        step_num: number of propagation steps
+        output_layer: whether to use the output layer
+    """
 
     def __init__(self, model_name, input_dim, output_dim, hidden_dim, step_num, output_layer=True):
         super(GCN, self).__init__()
@@ -52,6 +62,13 @@ class GCN(nn.Module):
         return ml
 
     def forward(self, feat, raw_adj):
+        """
+        Args:
+            feat: feature matrix (batch_num * node_num, input_dim)
+            raw_adj: adjacency matrix (batch_num, node_num, node_num)
+        Returns:
+            output: feature matrix of target nodes (batch_num, output_dim)
+        """
         batch_num, batch_size = raw_adj.shape[0], raw_adj.shape[1]
         ids = torch.range(0, (batch_num - 1) * batch_size, batch_size, dtype=torch.long).to(raw_adj.device)
         adj = torch.block_diag(*raw_adj).to(raw_adj.device)
@@ -70,6 +87,13 @@ class GCN(nn.Module):
         return X[ids]
 
     def avg_pooling(self, feats, adj):
+        """
+        Args:
+            feats: feature matrix (batch_num * node_num, input_dim)
+            adj: adjacency matrix (batch_num * node_num, batch_num * node_num)
+        Returns:
+            adj: adjacency matrix (batch_num * node_num, batch_num * node_num)
+        """
         nonzeros = torch.nonzero(torch.norm(feats, dim=1), as_tuple=True)[0]
         nonzero_adj = adj[:, nonzeros]
         row_sum = torch.sum(nonzero_adj, dim=1)
@@ -93,6 +117,15 @@ class GCN(nn.Module):
 def run(args, model_name, train_loader, val_loader, test_loader):
     """
     Evaluate GNN performance
+    Args:
+        args: arguments
+        model_name: model name ('gcn', 'gin', 'sgc', 'gat')
+        train_loader: training data loader
+        val_loader: validation data loader
+        test_loader: test data loader
+    Returns:
+        acc_mic: micro-F1 score
+        acc_mac: macro-F1 score
     """
 
     device = args.device
