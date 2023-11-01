@@ -34,6 +34,14 @@ class TrainerConfig:
             setattr(self, k, v)
 
 class Trainer:
+    """
+    Trainer for CGT model.
+    Args:
+        args: arguments
+        config: TrainerConfig object containing model configuration
+        model: CGT model
+        data_loader: DataLoader object for training data
+    """
     def __init__(self, args, config, model, data_loader):
         self.config = config
         self.args = args

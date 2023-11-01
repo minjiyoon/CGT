@@ -48,12 +48,12 @@ We provide brief descriptions for each file as follows:
 | data/ | download datasets |
 | generator/ | codes related to graph transformer |
 | generator/cluster.py | k-means or DP k-means clustering |
-| generator/gpt | codes related to computation graph transformer |
-| generator/gpt/gpt.py | prepare models, read datasets, train/generation loops |
-| generator/gpt/dataset.py | flatten computation graphs into sequences |
+| generator/gpt | CGT main directory |
+| generator/gpt/gpt.py | prepare models, prepare datasets, train/generation loops |
+| generator/gpt/dataset.py | dataset for flatten computation graphs |
 | generator/gpt/model.py | XLNet model |
 | generator/gpt/trainer.py | training loop |
-| generator/gpt/utils.py | utility functions |
+| generator/gpt/utils.py | generation loop |
 | task/ | GNN models |
 | task/aggregation | GNN models with different aggregation strategies (GCN, GAT, SGN, GIN) |
 | task/utils/dataset.py | Computation Graph Dataset for PyTorch DataParallel |

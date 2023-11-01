@@ -2,6 +2,7 @@ import argparse
 import torch
 
 def get_args():
+    """Argument parser from command line"""
     parser = argparse.ArgumentParser()
     # GNN training-related hyperparameters
     parser.add_argument('--epochs', type=int, default=200,

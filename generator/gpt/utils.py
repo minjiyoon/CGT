@@ -7,6 +7,16 @@ from torch.nn import functional as F
 
 @torch.no_grad()
 def sample(model, x, lbl, temperature=1.0, sample=True, top_k=None):
+    """
+    Sample nodes in sequence which will be reconstructed into a computation graph.
+    Args:
+        model: CGT model
+        x: seed nodes
+        lbl: seed labels
+        temperature: temperature of softmax
+        sample: whether to sample or take the most likely
+        top_k: k for top-k sampling
+    """
     model.eval()
 
     generated_ids = []

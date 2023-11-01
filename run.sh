@@ -1,7 +1,7 @@
 DATASETS=("cora" "citeseer")
 data_length=${#DATASETS[@]}
 
-# Experiment 1: effects of noise to aggregation strategies
+# Experiment: effects of noise to aggregation strategies
 NOISES=(0 2 4)
 noise_length=${#NOISES[@]}
 
